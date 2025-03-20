@@ -5,6 +5,7 @@ import InvoiceItems from "../../domain/invoice-items.entity";
 import Invoice from "../../domain/invoice.entity";
 import { InvoiceModel } from "./invoice.model";
 import InvoiceRepository from "./invoice.repository";
+import { InvoiceItemsModel } from "../invoice-items/invoice-items.model";
 
 describe("InvoiceRepository test", () => {
   let sequelize: Sequelize;
@@ -17,7 +18,7 @@ describe("InvoiceRepository test", () => {
       sync: { force: true },
     });
 
-    await sequelize.addModels([InvoiceModel]);
+    await sequelize.addModels([InvoiceModel, InvoiceItemsModel]);
     await sequelize.sync();
   });
 
@@ -52,6 +53,7 @@ describe("InvoiceRepository test", () => {
 
     const invoiceDb = await InvoiceModel.findOne({
       where: { id: invoiceProps.id.id },
+      include: [{ model: InvoiceItemsModel }],
     });
 
     expect(invoiceProps.id.id).toEqual(invoiceDb.id);
@@ -66,5 +68,45 @@ describe("InvoiceRepository test", () => {
     expect(invoiceProps.items[0].id.id).toEqual(invoiceDb.items[0].id);
     expect(invoiceProps.items[0].name).toEqual(invoiceDb.items[0].name);
     expect(invoiceProps.items[0].price).toEqual(invoiceDb.items[0].price);
+  });
+
+  it("should find an invoice", async () => {
+    const invoiceRepository = new InvoiceRepository();
+
+    InvoiceModel.create({
+      id: "1",
+      name: "Invoice 1",
+      document: "123456789",
+      street: "Rua 1",
+      number: "123",
+      complement: "Complement 1",
+      city: "City 1",
+      state: "State 1",
+      zipcode: "12345678",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    InvoiceItemsModel.create({
+      id: "1",
+      name: "Item 1",
+      price: 100,
+      invoiceId: "1",
+    });
+
+    const invoice = await invoiceRepository.find(1);
+
+    expect(invoice.id.id).toEqual("1");
+    expect(invoice.name).toEqual("Invoice 1");
+    expect(invoice.document).toEqual("123456789");
+    expect(invoice.address.street).toEqual("Rua 1");
+    expect(invoice.address.number).toEqual("123");
+    expect(invoice.address.complement).toEqual("Complement 1");
+    expect(invoice.address.city).toEqual("City 1");
+    expect(invoice.address.state).toEqual("State 1");
+    expect(invoice.address.zipCode).toEqual("12345678");
+    expect(invoice.items[0].id.id).toEqual("1");
+    expect(invoice.items[0].name).toEqual("Item 1");
+    expect(invoice.items[0].price).toEqual(100);
   });
 });

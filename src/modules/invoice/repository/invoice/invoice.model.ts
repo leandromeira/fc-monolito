@@ -29,7 +29,7 @@ export class InvoiceModel extends Model {
   number: string;
 
   @Column({ allowNull: true })
-  complement: string;
+  complement: string; // Opcional
 
   @Column({ allowNull: false })
   city: string;
@@ -40,7 +40,7 @@ export class InvoiceModel extends Model {
   @Column({ allowNull: false })
   zipcode: string;
 
-  @HasMany(() => InvoiceItemsModel)
+  @HasMany(() => InvoiceItemsModel, { onDelete: "CASCADE", hooks: true })
   items: InvoiceItemsModel[];
 
   @Column({ allowNull: false })
