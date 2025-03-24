@@ -8,33 +8,32 @@ import { InvoiceModel } from "./invoice.model";
 
 export default class InvoiceRepository implements InvoiceGateway {
   async generate(invoice: Invoice): Promise<void> {
-    await InvoiceModel.create({
-      id: invoice.id.id,
-      name: invoice.name,
-      document: invoice.document,
-      street: invoice.address.street,
-      number: invoice.address.number,
-      complement: invoice.address.complement,
-      city: invoice.address.city,
-      state: invoice.address.state,
-      zipcode: invoice.address.zipCode,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await Promise.all(
-      invoice.items.map((item) =>
-        InvoiceItemsModel.create({
+    await InvoiceModel.create(
+      {
+        id: invoice.id.id,
+        name: invoice.name,
+        document: invoice.document,
+        street: invoice.address.street,
+        number: invoice.address.number,
+        complement: invoice.address.complement,
+        city: invoice.address.city,
+        state: invoice.address.state,
+        zipcode: invoice.address.zipCode,
+        items: invoice.items.map((item) => ({
           id: item.id.id,
           name: item.name,
           price: item.price,
-          invoiceId: invoice.id.id,
-        })
-      )
+        })),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        include: [{ model: InvoiceItemsModel, as: "items" }],
+      }
     );
   }
 
-  async find(id: number): Promise<Invoice> {
+  async find(id: string): Promise<Invoice> {
     const invoice = await InvoiceModel.findOne({
       where: { id },
       include: [{ model: InvoiceItemsModel }],
