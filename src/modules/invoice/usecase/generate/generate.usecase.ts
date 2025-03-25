@@ -30,13 +30,14 @@ export default class GenerateInvoiceUseCase {
         input.state,
         input.zipCode
       ),
-      items: input.items.map((item) => {
-        return new InvoiceItems({
-          id: new Id(item.id),
-          name: item.name,
-          price: item.price,
-        });
-      }),
+      items: input.items.map(
+        (item) =>
+          new InvoiceItems({
+            id: new Id(item.id),
+            name: item.name,
+            price: item.price,
+          })
+      ),
     };
 
     const invoice = new Invoice(props);
@@ -57,7 +58,7 @@ export default class GenerateInvoiceUseCase {
         name: item.name,
         price: item.price,
       })),
-      total: invoice.items.length,
+      total: invoice.items.reduce((total, item) => total + item.price, 0),
     };
   }
 }

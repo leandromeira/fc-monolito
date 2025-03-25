@@ -1,9 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { InvoiceModel } from "../repository/invoice/invoice.model";
 import InvoiceFacadeFactory from "../factory/invoice.facade.factory";
-import Invoice from "../domain/invoice.entity";
 import { InvoiceItemsModel } from "../repository/invoice-items/invoice-items.model";
-import Id from "../../@shared/domain/value-object/id.value-object";
 
 describe("Invoice Facade test", () => {
   let sequelize: Sequelize;
@@ -51,7 +49,7 @@ describe("Invoice Facade test", () => {
       ],
     };
 
-    await invoiceFacade.generateInvoice(input);
+    await invoiceFacade.generate(input);
 
     const invoice = await InvoiceModel.findOne({
       where: { id: "1" },
