@@ -26,7 +26,7 @@ describe("Invoice Facade test", () => {
     const invoiceFacade = InvoiceFacadeFactory.create();
 
     const input = {
-      id: "1",
+      // id: "1",
       name: "Invoice 1",
       document: "1234-5678",
       street: "Rua 123",
@@ -49,7 +49,7 @@ describe("Invoice Facade test", () => {
       ],
     };
 
-    await invoiceFacade.generate(input);
+    const result = await invoiceFacade.generate(input);
 
     const invoice = await InvoiceModel.findOne({
       where: { id: "1" },
@@ -102,9 +102,9 @@ describe("Invoice Facade test", () => {
       ],
     };
 
-    await invoiceFacade.generateInvoice(input);
+    await invoiceFacade.generate(input);
 
-    const invoice = await invoiceFacade.findInvoice({ id: "1" });
+    const invoice = await invoiceFacade.find({ id: "1" });
     expect(invoice).toBeDefined();
     expect(invoice.id).toBeDefined();
     expect(invoice.name).toBe(input.name);

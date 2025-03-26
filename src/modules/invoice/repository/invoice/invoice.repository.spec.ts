@@ -94,7 +94,7 @@ describe("InvoiceRepository test", () => {
       invoiceId: "1",
     });
 
-    const invoice = await invoiceRepository.find(1);
+    const invoice = await invoiceRepository.find("1");
 
     expect(invoice.id.id).toEqual("1");
     expect(invoice.name).toEqual("Invoice 1");
