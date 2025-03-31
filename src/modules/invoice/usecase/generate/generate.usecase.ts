@@ -19,7 +19,7 @@ export default class GenerateInvoiceUseCase {
     input: GenerateInvoiceUseCaseInputDto
   ): Promise<GenerateInvoiceUseCaseOutputDto> {
     const props = {
-      // id: new Id(input.id) || new Id(),
+      id: new Id(input.id) || new Id(),
       name: input.name,
       document: input.document,
       address: new Address(
@@ -41,7 +41,7 @@ export default class GenerateInvoiceUseCase {
     };
 
     const invoice = new Invoice(props);
-    this._invoiceRepository.generate(invoice);
+    await this._invoiceRepository.generate(invoice);
 
     return {
       id: invoice.id.id,

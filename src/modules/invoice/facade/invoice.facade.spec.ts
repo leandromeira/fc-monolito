@@ -26,7 +26,6 @@ describe("Invoice Facade test", () => {
     const invoiceFacade = InvoiceFacadeFactory.create();
 
     const input = {
-      // id: "1",
       name: "Invoice 1",
       document: "1234-5678",
       street: "Rua 123",
@@ -52,7 +51,7 @@ describe("Invoice Facade test", () => {
     const result = await invoiceFacade.generate(input);
 
     const invoice = await InvoiceModel.findOne({
-      where: { id: "1" },
+      where: { id: result.id },
       include: [InvoiceItemsModel],
     });
 
@@ -79,7 +78,6 @@ describe("Invoice Facade test", () => {
     const invoiceFacade = InvoiceFacadeFactory.create();
 
     const input = {
-      id: "1",
       name: "Invoice 1",
       document: "1234-5678",
       street: "Rua 123",
@@ -102,25 +100,25 @@ describe("Invoice Facade test", () => {
       ],
     };
 
-    await invoiceFacade.generate(input);
+    const result = await invoiceFacade.generate(input);
 
-    const invoice = await invoiceFacade.find({ id: "1" });
-    expect(invoice).toBeDefined();
-    expect(invoice.id).toBeDefined();
-    expect(invoice.name).toBe(input.name);
-    expect(invoice.document).toBe(input.document);
-    expect(invoice.street).toBe(input.street);
-    expect(invoice.number).toBe(input.number);
-    expect(invoice.complement).toBe(input.complement);
-    expect(invoice.city).toBe(input.city);
-    expect(invoice.state).toBe(input.state);
-    expect(invoice.zipCode).toBe(input.zipCode);
-    expect(invoice.items.length).toBe(2);
-    expect(invoice.items[0].id).toBe(input.items[0].id);
-    expect(invoice.items[0].name).toBe(input.items[0].name);
-    expect(invoice.items[0].price).toBe(input.items[0].price);
-    expect(invoice.items[1].id).toBe(input.items[1].id);
-    expect(invoice.items[1].name).toBe(input.items[1].name);
-    expect(invoice.items[1].price).toBe(input.items[1].price);
+    const invoiceFound = await invoiceFacade.find({ id: result.id });
+    expect(invoiceFound).toBeDefined();
+    expect(invoiceFound.id).toBeDefined();
+    expect(invoiceFound.name).toBe(input.name);
+    expect(invoiceFound.document).toBe(input.document);
+    expect(invoiceFound.address.street).toBe(input.street);
+    expect(invoiceFound.address.number).toBe(input.number);
+    expect(invoiceFound.address.complement).toBe(input.complement);
+    expect(invoiceFound.address.city).toBe(input.city);
+    expect(invoiceFound.address.state).toBe(input.state);
+    expect(invoiceFound.address.zipCode).toBe(input.zipCode);
+    expect(invoiceFound.items.length).toBe(2);
+    expect(invoiceFound.items[0].id).toBe(input.items[0].id);
+    expect(invoiceFound.items[0].name).toBe(input.items[0].name);
+    expect(invoiceFound.items[0].price).toBe(input.items[0].price);
+    expect(invoiceFound.items[1].id).toBe(input.items[1].id);
+    expect(invoiceFound.items[1].name).toBe(input.items[1].name);
+    expect(invoiceFound.items[1].price).toBe(input.items[1].price);
   });
 });

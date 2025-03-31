@@ -7,8 +7,8 @@ import { InvoiceItemsModel } from "../invoice-items/invoice-items.model";
 import { InvoiceModel } from "./invoice.model";
 
 export default class InvoiceRepository implements InvoiceGateway {
-  async generate(invoice: Invoice): Promise<void> {
-    await InvoiceModel.create(
+  async generate(invoice: Invoice): Promise<Invoice> {
+    const invoiceCreated = await InvoiceModel.create(
       {
         id: invoice.id.id,
         name: invoice.name,
@@ -31,6 +31,29 @@ export default class InvoiceRepository implements InvoiceGateway {
         include: [{ model: InvoiceItemsModel, as: "items" }],
       }
     );
+    return new Invoice({
+      id: new Id(invoiceCreated.id),
+      name: invoiceCreated.name,
+      document: invoiceCreated.document,
+      address: new Address(
+        invoiceCreated.street,
+        invoiceCreated.number,
+        invoiceCreated.complement,
+        invoiceCreated.city,
+        invoiceCreated.state,
+        invoiceCreated.zipcode
+      ),
+      items: invoiceCreated.items.map(
+        (item) =>
+          new InvoiceItems({
+            id: new Id(item.id),
+            name: item.name,
+            price: item.price,
+          })
+      ),
+      createdAt: invoiceCreated.createdAt,
+      updatedAt: invoiceCreated.updatedAt,
+    });
   }
 
   async find(id: string): Promise<Invoice> {
