@@ -8,7 +8,9 @@ checkoutRoute.post("/", async (req: Request, res: Response) => {
     const checkoutFacade = CheckoutFacadeFactory.create();
     const input = {
       clientId: req.body.clientId,
-      products: req.body.products,
+      products: req.body.products.map((p: any) => {
+        return { productId: p.id };
+      }),
     };
 
     const output = await checkoutFacade.placeOrder(input);
