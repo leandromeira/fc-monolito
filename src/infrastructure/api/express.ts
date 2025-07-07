@@ -12,12 +12,13 @@ import ProductAdmModel from "../../modules/product-adm/repository/product.model"
 import ProductStoreCatalogModel from "../../modules/store-catalog/repository/product.model";
 import { checkoutRoute } from "./routes/checkout.route";
 import { clientRoute } from "./routes/client.route";
+import { productRoute } from "./routes/product-adm.route";
 
 export const app: Express = express();
 app.use(express.json());
 app.use("/clients", clientRoute);
+app.use("/products", productRoute);
 app.use("/checkout", checkoutRoute);
-// app.use("/product", productRoute);
 
 export let sequelize: Sequelize;
 
