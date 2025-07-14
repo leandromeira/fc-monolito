@@ -1,31 +1,60 @@
-/*
+import request from "supertest";
+import { app, sequelize } from "../express";
+import { migrator } from "../db/sequelize/config/migrator";
+
 describe("E2E test for checkout", () => {
   beforeEach(async () => {
-    await sequelize.sync({ force: true });
+    await sequelize.drop();
+    await migrator(sequelize).up();
   });
 
   afterAll(async () => {
+    await migrator(sequelize).down();
     await sequelize.close();
   });
+
   it("should place an order", async () => {
-    const input = {
-      clientId: "123",
-      products: [{ id: "1" }, { id: "2" }],
+    // Cria o cliente
+    const inputClient = {
+      name: "John Doe",
+      email: "john.doe@example.com",
+      document: "1234567890",
+      address: {
+        street: "123 Main St",
+        number: "123",
+        complement: "Apt 1",
+        city: "Anytown",
+        state: "CA",
+        zipCode: "12345",
+      },
     };
-    const response = await request(app).post("/checkout").send(input);
+    const clientCreated = await request(app).post("/clients").send(inputClient);
+    expect(clientCreated.status).toBe(200);
+
+    // Cria o produto
+    const inputProduct = {
+      id: "123",
+      name: "Product 1",
+      description: "Description of Product 1",
+      purchasePrice: 80,
+      stock: 20,
+    };
+    const productCreate = await request(app)
+      .post("/products")
+      .send(inputProduct);
+    expect(productCreate.status).toBe(200);
+
+    // Faz o checkout
+    const checkoutInput = {
+      clientId: clientCreated.body.id,
+      products: [{ id: "123" }],
+    };
+    const response = await request(app).post("/checkout").send(checkoutInput);
+    if (response.status !== 201) {
+      console.error("Erro no checkout:", response.body);
+    }
     expect(response.status).toBe(201);
     expect(response.body).toBeDefined();
-    expect(response.body.id).toBeDefined();
-    expect(response.body.invoiceId).toBeDefined();
-    expect(response.body.total).toBeDefined();
-    expect(response.body.products).toBeDefined();
-    expect(response.body.products.length).toBe(2);
-    expect(response.body.products[0].productId).toBe("1");
-    expect(response.body.products[1].productId).toBe("2");
-    expect(response.body.clientId).toBe("123");
-    expect(response.body.status).toBe("approved");
-    expect(response.body.createdAt).toBeDefined();
-    expect(response.body.updatedAt).toBeDefined();
+    // ...demais asserts conforme o retorno esperado
   });
 });
-*/

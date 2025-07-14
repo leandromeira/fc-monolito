@@ -1,12 +1,15 @@
 import request from "supertest";
 import { app, sequelize } from "../express";
+import { migrator } from "../db/sequelize/config/migrator";
 
 describe("E2E test for product", () => {
   beforeEach(async () => {
-    await sequelize.sync({ force: true });
+    await sequelize.drop();
+    await migrator(sequelize).up();
   });
 
   afterAll(async () => {
+    await migrator(sequelize).down();
     await sequelize.close();
   });
   it("should create a product", async () => {
