@@ -13,7 +13,7 @@ export const up: MigrationFn = async ({ context: sequelize }) => {
     complement: { type: DataTypes.STRING, allowNull: true },
     city: { type: DataTypes.STRING, allowNull: false },
     state: { type: DataTypes.STRING, allowNull: false },
-    zipCode: { type: DataTypes.STRING, allowNull: false },
+    zipcode: { type: DataTypes.STRING, allowNull: false },
     createdAt: { type: DataTypes.DATE, allowNull: false },
     updatedAt: { type: DataTypes.DATE, allowNull: false },
   });

@@ -21,6 +21,7 @@ const mockProductFacade = (): ProductAdmFacadeInterface => ({
 const mockCatalogFacade = (): StoreCatalogFacadeInterface => ({
   find: jest.fn(),
   findAll: jest.fn(),
+  updateSalesPrice: jest.fn(),
 });
 
 const mockPaymentFacade = (): PaymentFacadeInterface => ({

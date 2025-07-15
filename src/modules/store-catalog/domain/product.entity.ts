@@ -32,4 +32,11 @@ export default class Product extends BaseEntity implements AggregateRoot {
   get salesPrice(): number {
     return this._salesPrice;
   }
+
+  set salesPrice(value: number) {
+    if (value < 0) {
+      throw new Error("Sales price cannot be negative");
+    }
+    this._salesPrice = value;
+  }
 }

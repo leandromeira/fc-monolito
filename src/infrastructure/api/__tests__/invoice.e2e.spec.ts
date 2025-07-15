@@ -2,7 +2,7 @@ import request from "supertest";
 import { app, sequelize } from "../express";
 import { migrator } from "../db/sequelize/config/migrator";
 
-describe("E2E test for checkout", () => {
+describe("E2E test for invoice", () => {
   beforeEach(async () => {
     await sequelize.drop();
     await migrator(sequelize).up();
@@ -13,8 +13,7 @@ describe("E2E test for checkout", () => {
     await sequelize.close();
   });
 
-  it("should place an order", async () => {
-    // Cria o cliente
+  it("should get an invoice by id", async () => {
     const inputClient = {
       name: "John Doe",
       email: "john.doe@example.com",
@@ -29,9 +28,7 @@ describe("E2E test for checkout", () => {
       },
     };
     const clientCreated = await request(app).post("/clients").send(inputClient);
-    expect(clientCreated.status).toBe(200);
 
-    // Cria o produto
     const inputProduct = {
       id: "123",
       name: "Product 1",
@@ -39,28 +36,26 @@ describe("E2E test for checkout", () => {
       purchasePrice: 80,
       stock: 20,
     };
-    const productCreate = await request(app)
-      .post("/products")
-      .send(inputProduct);
-    expect(productCreate.status).toBe(200);
+    await request(app).post("/products").send(inputProduct);
 
-    const productSalesPriceUpdated = await request(app)
-      .put(`/products/sales-price/${productCreate.body.id}`)
+    await request(app)
+      .put(`/products/sales-price/123`)
       .send({ salesPrice: 120 });
-    expect(productSalesPriceUpdated.status).toBe(200);
 
-    // Faz o checkout
     const checkoutInput = {
       clientId: clientCreated.body.id,
-      products: [{ id: productCreate.body.id }],
+      products: [{ id: "123" }],
     };
-    const response = await request(app).post("/checkout").send(checkoutInput);
-    if (response.status !== 201) {
-      console.error("Erro no checkout:", response.body);
-    }
-    expect(response.status).toBe(201);
+    const checkoutResponse = await request(app)
+      .post("/checkout")
+      .send(checkoutInput);
+
+    const invoiceId =
+      checkoutResponse.body.invoiceId || checkoutResponse.body.id;
+    const response = await request(app).get(`/invoices/${invoiceId}`);
+
+    expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
-    expect(response.body.id).toBeDefined();
-    expect(response.body.products).toHaveLength(1);
+    expect(response.body.id).toBe(invoiceId);
   });
 });
